@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace YuraSoft.ExceptionHandler
+namespace YuraSoft.ErrorHandler
 {
 	/// <summary>
 	/// Error handler interface
 	/// </summary>
-	public interface IExceptionHandler
+	public interface IErrorHandler
 	{
 		public ValueTask HandleException(HttpContext httpContext, Exception exception);
 	}

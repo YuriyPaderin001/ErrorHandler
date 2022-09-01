@@ -2,25 +2,25 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace YuraSoft.ExceptionHandler
+namespace YuraSoft.ErrorHandler
 {
 	/// <summary>
 	/// Error handler middleware
 	/// </summary>
-	public class ExceptionHandlerMiddleware
+	public class ErrorHandlerMiddleware
 	{
 		private readonly RequestDelegate _next;
-		private readonly IExceptionHandler _exceptionHandler;
+		private readonly IErrorHandler _errorHandler;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="next">Request delegate</param>
-		/// <param name="exceptionHandler">Exception handler</param>
-		public ExceptionHandlerMiddleware(RequestDelegate next, IExceptionHandler exceptionHandler)
+		/// <param name="errorHandler">Error handler</param>
+		public ErrorHandlerMiddleware(RequestDelegate next, IErrorHandler errorHandler)
 		{
 			_next = next;
-			_exceptionHandler = exceptionHandler;
+			_errorHandler = errorHandler;
 		}
 
 		/// <summary>
@@ -28,7 +28,7 @@ namespace YuraSoft.ExceptionHandler
 		/// </summary>
 		/// <param name="context">HTTP context</param>
 		/// <returns>Returns task</returns>
-		public async ValueTask InvokeAsync(HttpContext context)
+		public async Task InvokeAsync(HttpContext context)
 		{
 			try
 			{
@@ -36,7 +36,7 @@ namespace YuraSoft.ExceptionHandler
 			}
 			catch (Exception ex)
 			{
-				await _exceptionHandler.HandleException(context, ex);
+				await _errorHandler.HandleException(context, ex);
 			}
 		}
 	}

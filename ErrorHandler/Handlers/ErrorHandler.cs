@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace YuraSoft.ExceptionHandler
+namespace YuraSoft.ErrorHandler
 {
 	/// <summary>
-	/// Default exception handler
+	/// Default error handler
 	/// </summary>
-	public class ExceptionHandler : IExceptionHandler
+	public class ErrorHandler : IErrorHandler
 	{
 		private ILogger _logger;
 		private JsonSerializerOptions? _options;
@@ -21,14 +20,14 @@ namespace YuraSoft.ExceptionHandler
 		/// </summary>
 		/// <param name="logger">Logger</param>
 		/// <param name="options">Serialization options</param>
-		public ExceptionHandler(ILogger logger, JsonSerializerOptions? options = null)
+		public ErrorHandler(ILogger logger, JsonSerializerOptions? options = null)
 		{
 			_logger = logger;
 			_options = options;
 		}
 
 		/// <summary>
-		/// Handle exception method
+		/// Handle error method
 		/// </summary>
 		/// <param name="httpContext">HTTP context</param>
 		/// <param name="exception">Exception</param>
@@ -38,10 +37,10 @@ namespace YuraSoft.ExceptionHandler
 			_logger.LogDebug("Handle exception. Request method: {method}, uri: {path}{query}. Exception: {@exception}", 
 				httpContext.Request.Method, httpContext.Request.Path, httpContext.Request.QueryString, exception);
 
-			IExceptionResponse exceptionResponse;
+			IErrorData exceptionResponse;
 			if (exception is IHandableException handableException)
 			{
-				exceptionResponse = handableException.ToExceptionResponse();
+				exceptionResponse = handableException.GetErrorData();
 
 				_logger.LogInformation(exceptionResponse.Message);
 			}
@@ -49,9 +48,7 @@ namespace YuraSoft.ExceptionHandler
 			{
 				string fullMessage = GetFullExceptionMessage(exception);
 
-				Dictionary<string, List<string>> invalidParameters = new Dictionary<string, List<string>>();
-				invalidParameters.Add("*", new List<string> { fullMessage });
-				exceptionResponse = new ExceptionResponse(StatusCodes.Status500InternalServerError, "Internal Server Error", invalidParameters);
+				exceptionResponse = new ErrorData(StatusCodes.Status500InternalServerError, "Internal Server Error");
 
 				_logger.LogError(fullMessage);
 			}
@@ -72,14 +69,15 @@ namespace YuraSoft.ExceptionHandler
 		/// <returns>Returns full exception message</returns>
 		private static string GetFullExceptionMessage(Exception exception)
 		{
-			StringBuilder stringBuilder = new StringBuilder();
-			Exception? currentException = exception;
-			while (currentException != null)
+			StringBuilder stringBuilder = new StringBuilder(exception.Message);
+
+			Exception? innerException = exception.InnerException;
+			while (innerException != null)
 			{
-				stringBuilder.Append(currentException.Message);
+				stringBuilder.Append(innerException.Message);
 				stringBuilder.Append(". ");
 
-				currentException = currentException.InnerException!;
+				innerException = innerException.InnerException!;
 			}
 
 			return stringBuilder.ToString();

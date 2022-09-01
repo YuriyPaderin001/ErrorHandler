@@ -1,10 +1,10 @@
-﻿namespace YuraSoft.ExceptionHandler
+﻿namespace YuraSoft.ErrorHandler
 {
 	/// <summary>
 	/// Handable exception interface
 	/// </summary>
 	public interface IHandableException
 	{
-		public IExceptionResponse ToExceptionResponse();
+		public IErrorData GetErrorData();
 	}
 }
