@@ -1,5 +1,7 @@
 .vs
-ErrorHandler/bin
-ErrorHandler/obj
-ErrorHandlerSandbox/bin
-ErrorHandlerSandbox/obj
+ExceptionHandler/bin
+ExceptionHandler/obj
+ExceptionHandlerSandbox/bin
+ExceptionHandlerSandbox/obj
+ExceptionHandler.Unit.Tests/bin
+ExceptionHandler.Unit.Tests/obj
